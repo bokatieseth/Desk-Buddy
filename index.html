@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>工位萌伴园</title>
+  <meta name="theme-color" content="#7cd1b8">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <link rel="apple-touch-icon" href="assets/icons/apple-touch-icon.png">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="stylesheet" href="style.css?v=0.3.3">
+</head>
+<body>
+  <header>
+    <img src="assets/logo/title.png" alt="工位萌伴园" class="title-logo">
+
+  </header>
+
+  <main>
+    <!-- Today -->
+ <section id="view-today" class="view">
+  <!-- Clock in -->
+  <div class="card">
+    <div id="clockin-area">
+      <button id="clockin-btn" class="primary"><span id="t-clockIn">打卡 Clock In</span></button>
+      <p id="clocked-text" class="muted hidden"></p>
+      <p class="muted small" id="t-clockInHint">打卡即送1个盲盒 | Clock in grants 1 blind box</p>
+    </div>
+  </div>
+
+  <!-- Tasks -->
+  <div class="card">
+    <h2 id="t-tasks">任务 Tasks</h2>
+    <div class="row-4">
+      <input id="task-input" placeholder="任务标题 / Task Title">
+      <input id="task-date" type="date" title="截止日期 / Due date">
+      <button id="task-add" class="secondary"><span id="t-addTask">添加任务 Add</span></button>
+    </div>
+    <ul id="task-list" class="tasks"></ul>
+    <p id="backlog-note" class="muted small hidden"></p>
+    <p class="muted small" id="t-progressHint">为大型任务设定“今日目标百分比”；达到目标计为完成。</p>
+  </div>
+
+  <!-- End of day -->
+  <div class="card end-panel">
+    <button id="endday-btn" class="accent" disabled>结束一天并开启 0 个盲盒</button>
+    <p class="muted small" id="t-endRules">规则：打卡即送1个； 全完成得2个； 部分完成得1个； 未完成得0个。</p>
+  </div>
+</section>
+
+    <!-- Binder -->
+    <section id="view-binder" class="view">
+      <div id="binder-empty" class="empty">还没有收藏哦 No collectibles yet</div>
+      <div id="binder" class="binder hidden">
+        <button class="page prev" id="binder-prev">‹</button>
+        <div class="spread">
+          <div class="page left">
+            <div class="slot" id="binder-slot-0"></div>
+            <div class="slot" id="binder-slot-1"></div>
+            <div class="slot" id="binder-slot-2"></div>
+            <div class="slot" id="binder-slot-3"></div>
+          </div>
+          <div class="page right">
+            <div class="slot" id="binder-slot-4"></div>
+            <div class="slot" id="binder-slot-5"></div>
+            <div class="slot" id="binder-slot-6"></div>
+            <div class="slot" id="binder-slot-7"></div>
+          </div>
+        </div>
+        <button class="page next" id="binder-next">›</button>
+      </div>
+    </section>
+
+    <!-- Desk -->
+<section id="view-desk" class="view active">
+  <div class="card desk-card">
+    <!-- Game scene -->
+    <div class="desk-scene">
+      <img src="assets/logo/title.png" alt="工位萌伴园" class="scene-logo">
+
+      <!-- Sticky note CTA to Today -->
+      <a id="note-today" class="wall-note" href="#" title="今日任务">今日任务</a>
+
+      <!-- Left shelf -->
+      <div class="desk-slot" data-slot="0" style="--x:12%; --y:11%; --w:24%; --h:20%;">
+        <div class="desk-item" id="desk-item-0"></div>
+      </div>
+      <!-- Right shelf -->
+      <div class="desk-slot" data-slot="1" style="--x:64%; --y:7%; --w:24%; --h:20%;">
+        <div class="desk-item" id="desk-item-1"></div>
+      </div>
+      <!-- Desk surface (left side) -->
+      <div class="desk-slot" data-slot="2" style="--x:6%; --y:45%; --w:28%; --h:18%;">
+        <div class="desk-item" id="desk-item-2"></div>
+      </div>
+
+      <!-- Controls overlay -->
+      <div class="desk-overlay">
+        <div class="slot-pills">
+          <button class="pill active" id="slot-0">槽位1</button>
+          <button class="pill" id="slot-1">槽位2</button>
+          <button class="pill" id="slot-2">槽位3</button>
+        </div>
+        <select id="desk-source"></select>
+        <button id="desk-place" class="primary">放到桌面</button>
+      </div>
+    </div>
+
+    <p class="muted small" id="t-deskHint">从收藏选择3个展示到“工位”。</p>
+  </div>
+</section>
+
+
+    <!-- Settings -->
+    <section id="view-settings" class="view">
+      <div class="card">
+        <h2 id="t-demo">演示 Demo</h2>
+        <button id="reset-btn" class="danger" style="margin-bottom:8px;">重置（清空任务/盲盒/收藏）</button>
+        <button id="gift-10" class="secondary">给我10个随机收藏（演示用）</button>
+      </div>
+      <div class="card">
+        <h2 id="t-about">关于 About</h2>
+        <p class="muted">工位萌伴园 v0.3 — prototype</p>
+      </div>
+    </section>
+  </main>
+  <!-- Dev Time (minimal helper UI) -->
+<div class="card" id="devtime-card">
+  <h2>开发时间 / Dev Time</h2>
+  <div class="row">
+    <input id="dev-dt" type="datetime-local" title="模拟现在 / Fake now">
+    <button id="dev-set" class="secondary">设置 Set</button>
+  </div>
+  <div class="row" style="margin-top:8px;">
+    <button id="dev-clear" class="danger">清除模拟时间 / Use Real Time</button>
+    <p id="dev-now-state" class="muted small" style="margin:8px 0 0 8px;"></p>
+  </div>
+</div>
+
+
+  <!-- Reveal modal -->
+  <dialog id="reveal">
+    <div class="reveal-card">
+      <h3 id="reveal-title">获得新藏品！</h3>
+      <div class="reveal-art" id="reveal-art">🎁</div>
+      <div class="tags">
+        <span id="reveal-rarity" class="tag"></span>
+        <span id="reveal-type" class="tag"></span>
+      </div>
+      <p class="muted" id="reveal-name"></p>
+      <div class="row">
+        <button id="reveal-share" class="secondary">分享 Share</button>
+        <button id="reveal-close" class="primary">好的 Nice!</button>
+      </div>
+    </div>
+  </dialog>
+
+  <footer>
+    <small>© 工位萌伴园</small>
+  </footer>
+
+  <script src="lang.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js?v=17')
+);
+    }
+  </script>
+<!-- Bottom Dock Tabs -->
+<nav class="dock">
+  <button id="tab-today"><span id="t-tabToday">今日任务</span></button>
+  <button id="tab-binder"><span id="t-tabBinder">收藏册</span></button>
+  <button id="tab-desk" class="active"><span id="t-tabDesk">桌面展示</span></button>
+  <button id="tab-settings"><span id="t-tabSettings">设置</span></button>
+</nav>
+<script>
+  // DEV ONLY: force SW off so CSS/HTML updates apply immediately
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.getRegistrations().then(rs => rs.forEach(r => r.unregister()));
+  }
+</script>
+<style id="overlay-click-hotfix">
+  /* Make the controls bar always clickable and on top */
+  .desk-overlay {
+    position: fixed !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    bottom: calc(var(--dock-h) + var(--safe-b) + 8px) !important;
+    z-index: 2147483647 !important;
+    pointer-events: auto !important;
+  }
+  .desk-overlay * { pointer-events: auto !important; }
+
+  /* Ensure invisible scene elements never eat taps */
+  .desk-scene .desk-slot,
+  .desk-scene .scene-logo,
+  .desk-scene .wall-note {
+    pointer-events: none !important;
+  }
+</style>
+<style>
+  /* Re-enable the sticky note */
+  .desk-scene .wall-note {
+    pointer-events: auto !important;
+    z-index: 2001;                     /* sits above scene/overlay just in case */
+  }
+  
+</style>
+
+</body>
+</html>

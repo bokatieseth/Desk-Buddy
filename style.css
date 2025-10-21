@@ -1,0 +1,848 @@
+:root{
+  --bg: #f7fafc;          /* airy off-white */
+  --card: #ffffff;        /* cards stay white */
+  --text: #2f3542;        /* deep gray-blue */
+  --muted: #76819a;       /* soft slate */
+  --primary: #7cd1b8;     /* mint */
+  --accent: #a99fe6;      /* periwinkle */
+  --danger: #ff7d99;      /* strawberry */
+  --border: #e6ecf5;      /* cool light border */
+  --ring: rgba(124,209,184,0.35);
+  --shadow: 0 10px 30px rgba(36, 55, 99, 0.08);
+}
+.title-logo{
+  display:block;
+  margin:0 auto 8px;
+  max-width:320px;
+  height:auto;
+  image-rendering:-webkit-optimize-contrast;
+}
+
+html,body{margin:0;padding:0;height:100%;overflow:hidden;}
+main{padding:0;margin:0;}
+.desk-scene{
+  position:relative;
+  width:100%;
+  height:100vh;
+  background:url('assets/scene/desk_bg.png') center/contain no-repeat;
+  overflow:hidden;
+}
+
+:root{ --dock: 72px; }  /* bottom taskbar height */
+
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font:16px/1.45 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif}
+
+h1, .title-logo{ display:none; }   /* hide big title to save space */
+nav{ display:flex; justify-content:space-around; gap:8px }
+
+h1, .title-logo{ display: none; }         /* hide big title to save space on mobile */
+nav{ display:flex; justify-content:space-around; gap:8px }
+nav button{ padding:10px 12px; border-radius:14px }
+
+nav button{padding:10px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text)}
+nav button.active{outline:2px solid var(--ring);background:#f1f5fd}
+main{padding:16px;max-width:960px;margin:0 auto}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:16px;box-shadow:var(--shadow)}
+.row{display:grid;grid-template-columns:1fr auto;gap:8px}
+.row-4{display:grid;grid-template-columns:1.2fr auto auto auto;gap:8px}
+input,select{padding:10px 12px;background:#fff;border:1px solid var(--border);border-radius:10px;color:var(--text);outline:none}
+input:focus,select:focus{border-color:var(--primary);box-shadow:0 0 0 4px var(--ring)}
+button{padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:#fff;color:var(--text);box-shadow:var(--shadow)}
+button.primary{background:var(--primary);border-color:var(--primary);color:#fff}
+button.accent{background:var(--accent);border-color:#a18bff;color:#fff}
+button.secondary{background:#eef8f5}
+button.danger{background:var(--danger);border-color:#ff5a7d;color:#fff}
+button:disabled{opacity:.6;filter:grayscale(.2)}
+ul{list-style:none;padding:0;margin:8px 0 0}
+.tasks li{display:grid;grid-template-columns:1fr auto;gap:12px;padding:10px;border:1px dashed var(--border);border-radius:12px;margin-bottom:8px;background:#fff}
+.tasks .title{font-weight:600}
+.tasks .meta{font-size:12px;color:var(--muted)}
+.tasks .bar{height:8px;background:#ffe3ef;border-radius:999px;overflow:hidden}
+.tasks .bar>div{height:8px;background:linear-gradient(90deg,var(--primary),var(--accent));width:0%}
+.small{font-size:12px}
+.muted{color:var(--muted)}
+.hidden{display:none}
+.view{display:none}
+.view.active{display:block}
+.empty{color:var(--muted);text-align:center;padding:48px 12px}
+/* Binder */
+.binder{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:10px}
+
+/* Fit binder to viewport minus dock; make inner pages fill available height */
+#view-binder{ height:calc(100dvh - var(--dock-h)) !important; overflow-y:auto !important; }
+#view-binder .binder{ max-width:960px; margin:0 auto; }
+
+/* Limit spread height so both pages are fully visible without being clipped */
+#view-binder .binder .spread{
+  height: calc(100dvh - var(--dock-h) - 24px);     /* a touch more headroom */
+  align-items: stretch;
+}
+
+#view-binder .binder .spread > .page{ height:100%; }  /* each page matches spread */
+
+
+
+/* Each binder page: simple vertical stack of 4 cards (fits reliably) */
+#view-binder .binder .spread .page.left,
+#view-binder .binder .spread .page.right{
+  display:flex;
+  flex-direction: column;
+  gap:12px;
+  box-sizing:border-box;
+}
+
+
+
+
+/* Ensure pages keep natural width */
+#view-binder .binder .spread .page{ min-width:auto; }
+
+
+
+/* Slots scale with viewport height so entire binder can fit on short screens */
+#view-binder .binder .slot{
+  width:100%;
+  height:auto;
+  min-width:auto;
+  min-height: clamp(96px, 22vh, 160px);   /* four per page fit the viewport */
+  margin:0;
+}
+
+
+ 
+.binder > .page.prev,
+.binder > .page.next{
+  border:none;background:#eef8f5;color:#ff6b8b;border-radius:12px;
+  padding:6px 12px;font-size:24px
+}
+
+/* Keep arrow buttons vertically centered and always visible in the scroll area */
+.binder > .page.prev,
+.binder > .page.next{
+  position: sticky;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+}
+
+/* Keep left/right pages above any translucent UI (arrows, chips) */
+#view-binder .binder .spread .page{ z-index: 1; position: relative; }
+
+
+
+.binder .spread{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  align-items:stretch;
+  width:100%;
+  overflow:visible; /* keep flip animation visible */
+}
+
+.binder .page.left,.binder .page.right{background:#fff;border:1px solid var(--border);border-radius:14px;padding:12px;box-shadow:var(--shadow)}
+.slot{
+  border:1px dashed var(--border);
+  border-radius:12px;
+  background:#f1f5fd;
+  display:flex; align-items:center; justify-content:center;
+  width:100%; height:100%;      /* fill grid track */
+  min-height:0;                 /* allow shrink */
+  margin:0;                     /* gaps come from grid gap */
+  overflow:hidden;              /* prevent inner bleed */
+}
+
+.slot .tile{
+  display:grid; justify-items:center; gap:6px;
+  width:100%; height:100%;
+  box-sizing:border-box;
+  grid-template-rows:auto 1fr auto; /* title grows, tags stick to bottom */
+}
+/* Prevent inner content from forcing overflow */
+.slot .tile > *{ min-width:0; }
+
+
+.tile .art{font-size:40px}
+.tile .meta{display:flex;gap:6px}
+.tag{font-size:11px;padding:2px 6px;border-radius:999px;border:1px solid var(--border);color:#a66}
+.tag.rare{color:#5b7cff;border-color:#5b7cff;background:#eef2ff}
+.tag.epic{color:#8a5cf6;border-color:#8a5cf6;background:#f2eaff}
+/* Reveal */
+.reveal-art{font-size:72px;margin:14px 0;animation:pop 600ms cubic-bezier(.2,.8,.2,1) forwards}
+@keyframes pop{from{transform:scale(.7) rotate(-6deg);opacity:.4}to{transform:scale(1) rotate(0);opacity:1}}
+footer{text-align:center;color:var(--muted);padding:28px 12px 40px}
+/* Desk polish */
+/* Make the desk card disappear (no white wrapper) */
+.desk-card{ padding: 0; background: transparent; border: none; box-shadow: none; margin: 0; }
+/* New rarity chips */
+.tag.mythic{ color:#d354ff; border-color:#d354ff; background:#f8e9ff; }
+.tag.avia  { color:#00bcd4; border-color:#00bcd4; background:#e6fbff; }
+
+/* Reveal glow for new tiers */
+.rarity-mythic .reveal-card{ box-shadow:0 0 60px 16px rgba(211,84,255,.28), var(--shadow); }
+.rarity-avia   .reveal-card{ box-shadow:0 0 60px 16px rgba(0,188,212,.28), var(--shadow); }
+
+/* Fill the viewport above the dock; no scroll needed */
+.desk-scene{
+  position: relative;
+  width: 100%;
+  height: calc(100vh - var(--dock)); /* full screen minus bottom dock */
+  margin: 0;
+  background: url('assets/scene/desk_bg.png') center/contain no-repeat;
+  border-radius: 0;
+}
+
+
+.desk-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:10px;
+}
+
+.desk{
+  background: radial-gradient(120% 80% at 50% 0%, rgba(124,209,184,0.18), transparent 60%),
+              linear-gradient(180deg, #ffffff 0%, #f2f7f5 100%);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 16px;
+  box-shadow: inset 0 2px 10px rgba(36,55,99,0.04);
+}
+
+.desk-slot{
+  backdrop-filter: none;
+}
+
+
+.desk-item{
+  background: #fff;
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 22px rgba(36,55,99,0.12);
+}
+
+
+
+/* Make collectible tiles feel like stickers */
+.tile{
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 10px 12px;
+  box-shadow: 0 10px 20px rgba(36,55,99,0.10);
+}
+.tile .art{ filter: drop-shadow(0 6px 8px rgba(36,55,99,0.12)); }
+/* === Desk as full UI (portrait) === */
+.desk-card{
+  padding:0; background:transparent; border:none; box-shadow:none;
+}
+main{ padding: 0; max-width: 100%; margin: 0; }
+html, body{ height:100%; overflow:hidden; } /* lock scrolling */
+
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+
+/* Invisible hit-boxes positioned by CSS variables from HTML */
+.desk-slot{
+  position:absolute;
+  left:var(--x); top:var(--y);
+  width:var(--w); height:var(--h);
+  display:grid; place-items:center;
+  background:transparent; border:none; box-shadow:none; border-radius:12px;
+}
+
+/* Sticker-style item (icon only) */
+.desk-item{
+  background:transparent; border:none; box-shadow:none;
+  width:100%; height:100%; display:grid; place-items:center;
+}
+.sticker{
+  font-size: clamp(64px, 14vw, 120px);
+  line-height: 1;
+  filter: none;          /* remove glow/blur */
+}
+
+/* ensure no placeholder text shows */
+.desk-item:empty::after{ content:none; }
+
+@media (max-width:520px){ .desk-scene{ border-radius:14px; } }
+/* Fullscreen mobile layout (no scrolling) */
+:root{ --dock: 72px; } /* height of bottom nav (header turned into dock) */
+
+html, body{ height:100%; overflow:hidden; }
+main{ padding:0; max-width:100%; margin:0; }
+.desk-card{ padding:0; background:transparent; border:none; box-shadow:none; margin:0; }
+
+/* Fill viewport minus bottom dock */
+.desk-scene{
+  position:relative;
+  width:100%;
+  height:calc(100vh - var(--dock));
+  margin:0;
+  background:url('assets/scene/desk_bg.png') center/contain no-repeat;
+}
+
+
+/* Invisible hit-boxes; positions come from inline --x/--y/--w/--h */
+.desk-slot{
+  position:absolute;
+  left:var(--x); top:var(--y);
+  width:var(--w); height:var(--h);
+  display:grid; place-items:center;
+  background:transparent; border:none; box-shadow:none;
+}
+
+/* Sticker only (no blur) */
+.desk-item{ background:transparent; border:none; box-shadow:none; width:100%; height:100%; display:grid; place-items:center; }
+.sticker{
+  font-size:clamp(72px, 18vw, 140px);
+  line-height:1;
+  filter:none;             /* remove glow/blur */
+}
+
+/* Controls overlay at bottom of scene */
+/* Replace your existing .desk-overlay block with this */
+.desk-overlay{
+  position: fixed;                 /* was absolute */
+  left: 50%;
+  bottom: calc(var(--dock-h) + 8px);  /* sits just above the dock */
+  transform: translateX(-50%);
+  display: flex; gap: 8px; align-items: center; flex-wrap: wrap;
+
+  z-index: 1000;                   /* always on top */
+  background: rgba(255,255,255,.9);
+  border: 1px solid var(--border);
+  border-radius: 14px; padding: 8px 10px;
+  box-shadow: 0 10px 24px rgba(36,55,99,.12);
+  backdrop-filter: saturate(1.2) blur(2px);
+
+  pointer-events: auto;            /* make sure the bar gets events */
+}
+.desk-overlay * { pointer-events: auto; }   /* its children too */
+.desk-overlay select { min-width: 180px; }  /* keep your width */
+.desk-overlay select { position: relative; z-index: 1001; }
+
+
+/* ensure pills never sit under the select/button */
+.slot-pills{ display:flex; gap:6px; flex:0 0 auto; pointer-events:auto; }
+.desk-overlay select{ flex:1 1 180px; min-width:160px; }
+#desk-place{ flex:0 0 auto; }
+
+
+/* Slot selector pills */
+.slot-pills{ display:flex; gap:6px; }
+.pill{
+  padding:8px 10px; border-radius:999px; border:1px solid var(--border);
+  background:#fff; color:#2f3542; font-weight:600;
+}
+.pill.active{ background:#eef8f5; outline:2px solid var(--ring); }
+.scene-logo{
+  position:absolute;
+  top:3%;
+  left:50%;
+  transform:translateX(-50%);
+  width:60%;
+  max-width:320px;
+  height:auto;
+  z-index:2;
+}
+/* ensure the desk controls sit above everything (dock, logo, etc.) */
+.desk-overlay{ z-index: 250; }
+.slot-pills, .pill { pointer-events: auto; }  /* belt-and-suspenders */
+/* Make overlay always top-most & interactive */
+.desk-overlay { z-index: 1000; }
+.desk-overlay, .desk-overlay * { pointer-events: auto; }
+
+/* Let the sticky note be clickable; keep slots/logo inert */
+.desk-scene .desk-slot,
+.desk-scene .scene-logo {
+  pointer-events: none !important;
+}
+.desk-scene .wall-note {
+  pointer-events: auto !important;
+  z-index: 3;
+}
+
+
+/* Sticky-note CTA (compact, beside-monitor fit) */
+.wall-note{
+  position:absolute;
+  left:35%;      /* ← nudge left/right */
+  top:43%;        /* ← nudge up/down */
+  padding:6px 10px;
+  font-size:14px; /* smaller so it fits the gap */
+  background:#fff6a0;
+  color:#4b4b2f;
+  font-weight:700;
+  border-radius:8px;
+  border:1px solid rgba(0,0,0,.06);
+  box-shadow:0 6px 12px rgba(0,0,0,.15);
+  transform:rotate(-7deg) scale(.92); /* slightly smaller overall */
+  text-decoration:none;
+  z-index:3;
+}
+
+/* Tiny phones: nudge a bit more + scale down */
+@media (max-width:380px){
+  .wall-note{ right:16%; top:45%; transform:rotate(-7deg) scale(.88); }
+}
+
+@media (max-width: 380px){
+  .wall-note{ right:20%; top:32%; }
+}
+
+:root {
+  --dock-h: 72px;
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+/* Hide the old header tabs (just in case you left a copy) */
+header .tabs { display: none; }
+
+/* Fixed bottom dock */
+.dock {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: calc(var(--dock-h) + var(--safe-b));
+  padding: 8px 12px calc(8px + var(--safe-b));
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  background: #fff;
+  border-top: 1px solid rgba(0,0,0,.08);
+  backdrop-filter: blur(6px) saturate(1.05);
+  z-index: 200;
+}
+
+/* Make sure page content doesn’t hide behind the dock */
+main, .view, .desk-scene {
+  padding-bottom: calc(var(--dock-h) + var(--safe-b));
+}
+/* Show only the active view */
+.view { display: none; }
+.view.active { display: block; }
+#view-desk {
+  background:
+    radial-gradient(80% 60% at 50% 15%,
+      #61C4C8 0%,
+      #61C4C8 45%,
+      #61C4C8 100%
+    );
+}
+
+/* === Binder: flip animation === */
+.binder .spread{ perspective:1200px; transform-style:preserve-3d; }
+.binder .spread .page{ transform-origin:center; backface-visibility:hidden; }
+
+.binder .spread .page.left{ transform-origin:right center; }
+.binder .spread .page.right{ transform-origin:left center; }
+
+@keyframes flipLeft{ from{transform:rotateY(0)} to{transform:rotateY(-180deg)} }
+@keyframes flipRight{ from{transform:rotateY(0)} to{transform:rotateY(180deg)} }
+
+.binder .spread .page.turn-left{ animation:flipLeft 420ms cubic-bezier(.2,.8,.2,1); }
+.binder .spread .page.turn-right{ animation:flipRight 420ms cubic-bezier(.2,.8,.2,1); }
+
+/* === Today tasks: sticky-note board look === */
+.card.board{
+  background:#fff7c2;
+  border-color:#e7d98a;
+  box-shadow:0 8px 20px rgba(0,0,0,.08) inset, var(--shadow);
+}
+.tasks li.sticky{
+  background:#fffbe0;
+  border:1px solid #f0e3a6;
+  box-shadow:0 10px 18px rgba(36,55,99,.10), 0 1px 0 #fff inset;
+  transform:rotate(-.3deg);
+  border-radius:12px;
+}
+
+/* === Reveal: rarity glow + confetti === */
+.rarity-common .reveal-card{ box-shadow:0 0 0 0 rgba(0,0,0,0); }
+.rarity-rare   .reveal-card{ box-shadow:0 0 40px 8px rgba(91,124,255,.25); }
+.rarity-epic   .reveal-card{ box-shadow:0 0 50px 12px rgba(138,92,246,.28); }
+
+.confetti{
+  position:absolute; top:-12px; width:8px; height:12px;
+  background:#ffd166; opacity:.9; transform:rotate(15deg);
+  animation:fall linear forwards;
+}
+.confetti.r2{ background:#5b7cff; }
+.confetti.r3{ background:#8a5cf6; }
+.confetti.r4{ background:#ff7d99; }
+@keyframes fall{
+  to{ transform:translateY(130vh) rotate(360deg); opacity:.95; }
+}
+
+/* Optional: tiny celebratory wiggle for the wall note when dialog opens */
+.wall-note.wiggle{ animation:wiggle 800ms ease-in-out; }
+@keyframes wiggle{
+  0%{transform:rotate(-7deg) translateY(0)}
+  40%{transform:rotate(-3deg) translateY(-2px)}
+  100%{transform:rotate(-7deg) translateY(0)}
+}
+/* === Binder: flip animation === */
+.binder .spread{ perspective:1200px; transform-style:preserve-3d; }
+.binder .spread .page{ transform-origin:center; backface-visibility:hidden; }
+.binder .spread .page.left{ transform-origin:right center; }
+.binder .spread .page.right{ transform-origin:left center; }
+
+@keyframes flipLeft{ from{transform:rotateY(0)} to{transform:rotateY(-180deg)} }
+@keyframes flipRight{ from{transform:rotateY(0)} to{transform:rotateY(180deg)} }
+
+.binder .spread .page.turn-left{ animation:flipLeft 420ms cubic-bezier(.2,.8,.2,1); }
+.binder .spread .page.turn-right{ animation:flipRight 420ms cubic-bezier(.2,.8,.2,1); }
+
+/* === FIX: Non-desk pages should scroll & fit under the dock === */
+#view-today,
+#view-binder,
+#view-settings{
+  padding:16px 16px calc(var(--dock-h) + var(--safe-b) + 12px);
+  min-height:calc(100vh - var(--dock-h));
+  overflow:auto;                     /* allow vertical scroll */
+  -webkit-overflow-scrolling:touch;  /* smooth on iOS */
+}
+
+/* Responsive inputs row so it never overflows on small screens */
+@media (max-width: 480px){
+  .row-4{ grid-template-columns: 1fr 1fr; }  /* two columns */
+  #task-add{ grid-column: 1 / -1; }          /* Add button full width on next row */
+
+  /* Task items: stack controls under the text on narrow screens */
+  .tasks li{ grid-template-columns: 1fr; }
+}
+/* 1) Hide any time input, no matter where it comes from */
+#task-time,
+input[type="time"] { 
+  display: none !important;
+}
+
+/* 2) Row layout: we now have title + date + button (3 columns) */
+.row-4{
+  display: grid;
+  grid-template-columns: 1.2fr auto auto;
+  gap: 8px;
+}
+
+/* keep the small-screen rules */
+@media (max-width: 480px){
+  .row-4{ grid-template-columns: 1fr 1fr; }
+  #task-add{ grid-column: 1 / -1; }
+}
+#task-list{ max-height:none; overflow:visible; }
+/* Make non-desk pages true scroll containers */
+#view-today,
+#view-binder,
+#view-settings{
+  position: relative;
+  height: calc(100vh - var(--dock-h));        /* was min-height */
+  padding: 16px 16px calc(var(--dock-h) + var(--safe-b) + 24px);
+  overflow-y: auto !important;                 /* force vertical scroll */
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Safety: the task list itself should never clip */
+#task-list{ max-height: none; overflow: visible; }
+/* === Reveal dialog (scoped, safe) === */
+#reveal { border:none; padding:0; background:transparent; }
+#reveal:not([open]) { display:none !important; }
+
+#reveal[open]{
+  position: fixed;
+  inset: 0;                 /* fill the viewport */
+  width: 100vw;
+  height: 100dvh;
+  margin: 0;                /* kill UA margins */
+  transform: none;          /* kill UA translate(-50%,-50%) */
+  display: grid;
+  place-items: center;      /* center the card */
+  z-index: 1000;
+  background: transparent;
+  padding: 0;
+}
+
+
+#reveal::backdrop{ background:rgba(0,0,0,.45); }
+
+/* The card itself – full styling lives here */
+.reveal-card{
+  background:#fff;
+  border:1px solid var(--border);
+  border-radius:16px;
+  padding:16px;
+  text-align:center;
+  box-shadow:var(--shadow);
+}
+/* Keep <dialog> centered and fully visible on small viewports */
+dialog {
+  position: fixed;
+  inset: auto;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0;
+  max-width: 420px;
+  width: calc(100vw - 32px);
+  border: none;
+  background: transparent; /* your card supplies the surface */
+}
+
+dialog::backdrop { background: rgba(0,0,0,.35); }
+
+.reveal-card {
+  max-height: calc(100dvh - 120px); /* avoid clipping under notches/toolbars */
+  overflow: auto;
+  padding: 20px;           /* keep your existing inner spacing */
+  border-radius: 16px;     /* keep your style */
+  background: #fff;        /* keep your style */
+}
+
+/* iOS safe-area padding at the very top of pages */
+:root{
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+main { padding-top: calc(8px + var(--safe-t)); }
+
+
+/* optional glow based on rarity (dialog gets the class in JS) */
+#reveal.rarity-common .reveal-card{ box-shadow:var(--shadow); }
+#reveal.rarity-rare   .reveal-card{ box-shadow:0 0 40px 8px rgba(91,124,255,.25), var(--shadow); }
+#reveal.rarity-epic   .reveal-card{ box-shadow:0 0 50px 12px rgba(138,92,246,.28), var(--shadow); }
+
+
+#reveal { border: none; padding: 0; background: transparent; }
+
+/* === End-of-day panel: centered, tidy === */
+#view-today .end-panel{
+  width: min(360px, calc(100% - 32px));
+  margin: 12px auto 16px !important;  /* bottom = 16px to match others */
+  text-align: center;
+}
+
+
+/* Make the pill-like button sit centered at the top */
+#view-today .end-panel #endday-btn{
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
+  padding: 10px 14px;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  white-space: normal;                    /* allow wrap if needed on small screens */
+}
+/* Safe-area variables */
+:root{
+  --safe-t: env(safe-area-inset-top, 0px);
+  --safe-b: env(safe-area-inset-bottom, 0px);
+}
+
+/* Give the page breathing room at the very top */
+body { padding-top: calc(10px + var(--safe-t)); }
+
+/* Keep the header from being covered on iOS/Android */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  padding-top: var(--safe-t);
+  background: linear-gradient(#ffffff, #ffffff00 24px);
+}
+
+/* Dialog: truly centered, scrollable inside, never off-screen */
+dialog {
+  position: fixed;
+  inset: 0;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  background: transparent;
+  border: none;
+}
+dialog::backdrop { background: rgba(0,0,0,.35); }
+
+.reveal-card{
+  max-width: 420px;
+  width: calc(100vw - 32px);
+  max-height: calc(100dvh - (32px + var(--safe-t) + var(--safe-b)));
+  overflow: auto;
+  padding: 20px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+/* If you use anchor scrolling anywhere, keep sections clear of the top edge */
+.view { scroll-margin-top: calc(16px + var(--safe-t)); }
+
+/* Body copy under the button — left align, but within the centered card */
+#view-today .end-panel #t-endRules{
+  text-align: left;
+  line-height: 1.45;
+  margin: 0;
+}
+
+/* Ensure the bottom controls are on top and clickable */
+.desk-scene { position: relative; overflow: visible; }
+.desk-overlay,
+.desk-overlay * { pointer-events: auto; }        /* ...except the controls */
+.desk-overlay { z-index: 9999; }                 /* above dock/scene */
+/* --- TOP-CUT-OFF HOTFIX (place at end of CSS) --- */
+
+/* Let non-desk pages scroll normally */
+html, body { overflow: visible !important; }
+
+/* Header has no visible content; don't keep it sticky */
+header {
+  position: static !important;
+  height: 0 !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+/* Give pages their own safe top padding instead */
+#view-today,
+#view-binder,
+#view-settings {
+  position: relative;
+  height: auto !important;                        /* avoid hard 100vh locking */
+  min-height: calc(100dvh - var(--dock-h));       /* still fill the screen */
+  padding-top: calc(16px + var(--safe-t)) !important;
+  overflow-y: auto !important;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Keep the desk scene locked (unchanged behavior there) */
+#view-desk { overflow: hidden !important; }
+/* Remove top stripe on Desk; pages handle their own safe-area padding */
+body { padding-top: 0 !important; }
+
+/* Belt-and-suspenders: ensure the desk section isn’t adding top space */
+#view-desk { padding-top: 0 !important; margin-top: 0 !important; }
+/* 1) Absolutely no top padding anywhere (some earlier rules re-add it) */
+html, body, main, #view-desk { padding-top: 0 !important; }
+
+/* 2) Use dynamic viewport so the scene really fills the screen */
+:root { --dock-h: 72px; --safe-t: env(safe-area-inset-top, 0px); }
+.desk-scene { height: calc(100dvh - var(--dock-h)) !important; }
+
+/* 3) Paint the notch/safe-area with the same tone as your desk page.
+      (This hides any sub-pixel seam from the document background.) */
+#view-desk::before{
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: var(--safe-t);
+  /* match the outer rim of your #view-desk gradient */
+  background: #61C4C8;
+  z-index: 1;
+}
+
+/* Optional: make the page background the same family, so even if it peeks,
+   it won’t look like a white line on scroll-bounce. */
+html, body { background: #61C4C8 !important; }
+
+
+/* Make each desk item sit on the bottom edge of its slot */
+.desk-item{
+  display: grid;                 /* already grid in your code */
+  place-items: end center;       /* ⬅️ bottom + centered */
+}
+
+/* Anything rendered inside (emoji or img) should size *up to* the slot,
+   but rest on the bottom */
+.sticker,
+.desk-item .sticker,
+.desk-item img.sticker{
+  max-height: 100%;
+  max-width: 100%;
+  width: auto;                   /* avoid forced stretch */
+  height: auto;                  /* avoid forced stretch */
+  object-fit: contain;
+  align-self: end;               /* belt-and-suspenders bottom anchor */
+  justify-self: center;
+  transform-origin: bottom center;  /* scaling pivots from the “floor” */
+}
+/* === Per-slot scaling for desk stickers === */
+/* Anchor + scale from bottom center for consistent perspective */
+.desk-slot .sticker,
+.desk-slot img.sticker {
+  transform: scale(var(--scale, 1));
+  transform-origin: bottom center;
+  will-change: transform;
+}
+/* Force desk stickers to size naturally and sit on the floor */
+.desk-item{
+  display:grid;
+  align-items:end;           /* bottom */
+  justify-items:center;      /* centered */
+}
+
+.desk-item img.sticker,
+.desk-item .sticker{
+  width:auto !important;     /* override inline width:100% */
+  height:auto !important;    /* override inline height:100% */
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  align-self:end;            /* belt-and-suspenders bottom anchor */
+  justify-self:center;
+  transform-origin: bottom center;
+}
+
+/* per-slot scaling (uses --scale var) */
+.desk-slot .sticker { transform: scale(var(--scale,1)); transform-origin: bottom center; }
+
+/* === Ground shadow for desk items === */
+.desk-item::before {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 60%;
+  height: 12%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(
+    ellipse at center,
+    rgba(0, 0, 0, 0.25) 0%,
+    rgba(0, 0, 0, 0.12) 35%,
+    rgba(0, 0, 0, 0.06) 65%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  filter: blur(4px);
+  opacity: 0.8;
+  z-index: 0;                /* stay behind the sticker */
+  pointer-events: none;
+}
+
+/* Keep sticker above the shadow */
+.desk-item > .sticker {
+  position: relative;
+  z-index: 1;
+}
+/* --- Minimal safe sparkle confetti inside the card --- */
+@keyframes gmb-spark {
+  0%   { transform: translate(-50%, -50%) scale(0.2) rotate(0deg);   opacity: 0; }
+  12%  { opacity: 1; }
+  100% { transform: translate(var(--tx, -50%), var(--ty, -50%)) scale(1) rotate(var(--rot, 360deg)); opacity: 0; }
+}
+.gmb-spark-layer {
+  position: absolute; inset: 0; pointer-events: none; overflow: visible;
+}
+.gmb-spark {
+  position: absolute; left: 50%; top: 50%;
+  width: 10px; height: 10px; border-radius: 50%;
+  background: var(--c, #ffd266);
+  box-shadow: 0 0 8px rgba(0,0,0,.12);
+  transform: translate(-50%, -50%) scale(0.2);
+  opacity: 0;
+  animation: gmb-spark var(--dur, 900ms) ease-out forwards;
+}
+.gmb-spark.star { 
+  width: 12px; height: 12px; 
+  clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%);
+}
