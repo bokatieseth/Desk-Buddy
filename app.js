@@ -292,7 +292,7 @@ const CATALOG = {
 // === Auto-load collectibles from index.txt ===
 async function autoLoadCollectibles() {
   try {
-    const text = await fetch('assets/collectibles/index.txt').then(r => r.text());
+    const text = await fetch('./assets/collectibles/index.txt').then(r => r.text());
     text.split(/\r?\n/).forEach(line => {
       const parts = line.split(',').map(s => s.trim());
       if (parts.length < 4) return;
@@ -305,7 +305,7 @@ async function autoLoadCollectibles() {
         id, type, rarity,
         fallbackName: name,
         nameKey: `collectible.${type}.${filename}`,
-        art: `assets/collectibles/${filename}`
+        art: `./assets/collectibles/${filename}`
       });
     });
   } catch (err) {
